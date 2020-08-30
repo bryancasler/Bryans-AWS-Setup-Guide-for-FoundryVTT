@@ -6,6 +6,9 @@
 
 My personal set up guide for running FoundryVTT on AWS.
 
+## Overview
+This is a guide for creating an AWS EC2 and S3 instance to run FoundryVTT for free in the cloud. Instructions are for Mac users and meant to be step by step. The end result will be Foundry running on your custom domain (e.g. https://www.mygamename.mydomain.com).
+
 ## Create an AWS Account
 TBD
 
