@@ -4,10 +4,10 @@
 
 ![Bryan's AWS Set Up Guide for FoundryVTT](https://raw.githubusercontent.com/bryancasler/Bryans-AWS-Setup-Guide-for-FoundryVTT/master/assets/Bryan's%20AWS%20Setup%20Guide%20for%20Foundry%20VTT%20-%20Title%20-%20On%20White.png)
 
-My personal set up guide for running FoundryVTT on AWS.
+My personal setup guide for getting FoundryVTT running on a free instance of AWS.
 
 ## Overview
-This is my personal set up guide for running FoundryVTT on AWS. It is step-by-step instructions for creating an AWS EC2 and S3 instance for free in the cloud. And then instructions, for Mac users, to set up foundry on the EC2 instance.. The end result will be Foundry running on your custom domain (e.g. https://www.mygamename.mydomain.com).
+This step-by-step guide provides instructions for creating free AWS EC2 and AWS S3 instances for running FoundryVTT in the cloud. The intruction also include details for installing FoundryVTT on the Unbuntu server running on your AWS EC2 instance.  All instructions are for Mac users. The end result will be FoundryVTT running for free in the cloud using a custom domain (e.g. https://www.mygame.mydomain.com) you own.
 
 ## Introduction
 While the official KB provides some useful information for setting up Foundry VTT on AWS, a complete guide to doing so is outside its scope. However, a guide to doing so that also outlines some best practices for the use of Amazon Web Services seems like it would be handy to help others along and make their setup process a little smoother. This guide is intended as an outline of the basic infrastructure needed and how to set it up on AWS. It is not intended as a guide for setting up and configuring the server itself. The excellent [Ubuntu setup guide](https://github.com/foundry-vtt-community/wiki/wiki/Ubuntu-VM) more than adequately documents how to set up the actual webserver and Foundry server. I’ll relink it again at the appropriate point in this guide, but you might want to keep it open in a separate tab. Also, while this guide is intended to be approachable by people with little to no experience with the AWS platform, it is not intended as a general introduction to it.
