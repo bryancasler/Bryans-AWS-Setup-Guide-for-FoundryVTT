@@ -25,5 +25,5 @@ TBD
 TBD
 
 ## Miscellaneous Resources
-- [Foundry VTT Communitu - Self Hosting on AWS](https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/)
+- [Foundry VTT Community - Self Hosting on AWS](https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/)
 - [Foundry VTT Community - Unbuntu VW](https://github.com/foundry-vtt-community/wiki/wiki/Ubuntu-VM)
