@@ -564,6 +564,8 @@ Once you’ve done that, you should be able to launch a game table and open the 
 Add info about Elastic EC2 IP Addresses
 Add better info about domain and sub-domain setup for Hover.com
 Add info about Vouch-Proxy SSO login (https://github.com/vouch/vouch-proxy) and (https://www.reddit.com/r/FoundryVTT/comments/hw14rr/anyone_else_using_container/)
+Add info about Resource Monitoring for EC2 / S3
+Add info about connecting FoudnryVTT storage with S3
 
 ## Contributions
 - [Foundry VTT Community - Self Hosting on AWS](https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/)
