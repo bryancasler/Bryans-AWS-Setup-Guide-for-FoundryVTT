@@ -559,6 +559,6 @@ Save the file, then go into the Configuration tab of the Foundry setup page. Put
 
 Once you’ve done that, you should be able to launch a game table and open the image browser. You should see a tab for Amazon S3 that will let you choose objects uploaded to S3 as well as upload objects to S3. Note that if you like organization, you cannot create folders or delete in S3 from this tab at this time – you’ll need to use the S3 console to create folders for organization, or remove media you no longer need.
 
-## Miscellaneous Resources
+## Contributions
 - [Foundry VTT Community - Self Hosting on AWS](https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/)
-- [Foundry VTT Community - Unbuntu VW](https://github.com/foundry-vtt-community/wiki/wiki/Ubuntu-VM)
+- [Foundry VTT Community - Unbuntu VW](https://github.com/foundry-vtt-community/wiki/wiki/Ubuntu-VM) - @ShadowMorph from Discord provided additions to the nginx/SSl configuration which Saif Addin partly added to the above config. Without ShadowMorph's support, the auto-refreshing would not have worked and the SSL configuration would be quite a bit less robust.
