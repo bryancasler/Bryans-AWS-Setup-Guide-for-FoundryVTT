@@ -251,7 +251,7 @@ Check if Foundry starts up without any errors by running it from the command lin
 
 If you get the error `Error: The fallback data path /home/ubuntu/.local/share/FoundryVTT does not exist.` then do the following. Type "cd" and hit enter. This will put you in the parent directory. Now type `mkdir -p .local/share/FoundryVTT` and hit enter. Now type `foundry` and hit enter and then `node /home/ubuntu/foundry/resources/app/main.js --port=8080`.
 
-### Your instance is running!?
+### Your instance is running!
 If you see something similar to the following, your FoundryVTT instance is running!
 
 ```
@@ -260,6 +260,284 @@ FoundryVTT | 2020-08-31 02:46:52 | [info] Requesting UPnP port forwarding to des
 FoundryVTT | 2020-08-31 02:46:52 | [info] Server started and listening on port 8080
 ```
 
+Type **Control+C** to terminate this process so we can get back to work and finalize our setup
+
+### Set up Process Manager pm2 to startup FoundryVTT automatically on server boot
+First, we need to configure the process manager to startup automatically on server boot. Go back into terminal and type in `pm2 startup` and hit enter. You should see something like
+
+```
+[PM2] Init System found: systemd
+[PM2] To setup the Startup Script, copy/paste the following command:
+sudo env PATH=$PATH:/usr/local/bin /usr/local/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+```
+
+Copy and paste that last line listed back into the terminal and hit enter. You should see the following
+
+```
+[PM2] [v] Command successfully executed.
++---------------------------------------+
+[PM2] Freeze a process list on reboot via:
+$ pm2 save
+
+[PM2] Remove init script via:
+$ pm2 unstartup systemd
+```
+
+### Start FoundryVTT using pm2
+Copy and paste the following, and hit enter.
+
+`pm2 start "node /home/ubuntu/foundry/resources/app/main.js" --name "foundry" -- --port=8080`
+
+You should see something similar to the following.
+
+```
+[PM2] Starting /home/ubuntu/foundry/resources/app/main.js in fork_mode (1 instance)
+[PM2] Done.
+┌──────────┬────┬─────────┬──────┬───────┬────────┬─────────┬────────┬─────┬───────────┬────────┬──────────┐
+│ App name │ id │ version │ mode │ pid   │ status │ restart │ uptime │ cpu │ mem       │ user   │ watching │
+├──────────┼────┼─────────┼──────┼───────┼────────┼─────────┼────────┼─────┼───────────┼────────┼──────────┤
+│ foundry  │ 0  │ 0.3.2   │ fork │ 31130 │ online │ 0       │ 0s     │ 0%  │ 8.9 MB    │ ubuntu │ disabled │
+└──────────┴────┴─────────┴──────┴───────┴────────┴─────────┴────────┴─────┴───────────┴────────┴──────────┘
+ ```
+ 
+`pm2 start foundry`, `pm2 stop foundry`, `pm2 restart foundry` can control the running status of Foundry and `pm2 delete foundry` will remove this process from the pm2 config.
+
+### Save pm2 settings
+Once everything is settled and running, you can type `pm2 save` and hit enter. This will save the current settings so they persist after the next server reboot.
+ 
+ 
+### Setting Up the Reverse Proxy
+nginx likes log messages an so do you (even if you don't know it yet). Let's create a directory to store those messages in a structured manner: `sudo mkdir /var/log/nginx/foundry`.
+
+The configuration files for nginx are stored at /etc/nginx and split up in `/etc/nginx/sites-available` for configuration thats are already setup, and `/etc/nginx/sites-enabled` with links to configurations that should be enabled. So let's create a reverse proxy configuration for our Foundry instance running on `127.0.0.1:8080`. The `127.0.0.1` is an IP alias (to simplyfy it) for your own host, so whenever you see that or `localhost`, it means: "This is running locally, on my host, don't search the internet for it, it's right here."
+
+We need to allow larger upload sizes (scene backgrounds are sometimes rather large). 10 MB should be quite okay, but feel free to adjust this value.
+
+Edit the nginx configuration and append the following line into the section `http { ... }` right before the closing bracket, this is rather important:
+
+`sudo nano /etc/nginx/nginx.conf`
+
+```
+http {
+	# Other settings, puth this right at the end of the http-section (this is important!)
+        client_max_body_size 10m;
+}
+```
+Afterwards, we can create a new configuration for our reverse proxy for Foundry: `sudo nano /etc/nginx/sites-available/foundry`.
+
+Copy the following contents and paste it into the nano editor, then adjust every occurance of the port number :8080 and your FQDN to your configuration, then save the file.
+
+```
+server {
+    listen 80;
+
+    # Adjust this to your the FQDN you chose!
+    server_name                 foundry.myhost.com;
+
+    access_log                  /var/log/nginx/foundry/access.log;
+    error_log                   /var/log/nginx/foundry/error.log;
+
+    location / {
+        proxy_set_header        Host $host;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
+
+        # Adjust the port number you chose!
+        proxy_pass              http://127.0.0.1:8080;
+
+        proxy_http_version      1.1;
+        proxy_set_header        Upgrade $http_upgrade;
+        proxy_set_header        Connection "Upgrade";
+        proxy_read_timeout      90;
+
+        # Again, adjust both your FQDN and your port number here!
+        proxy_redirect          http://127.0.0.1:8080 http://foundry.myhost.com;
+    }
+}
+```
+
+Let's create a link from this configuration to enable it: `sudo ln -s /etc/nginx/sites-available/foundry /etc/nginx/sites-enabled/foundry`. Restart the server to reflect the changes: `sudo service nginx restart`. Check the browser, not pointing at port 80 (we are not yet installing the certificate) to see if the reverse proxy is working correctly: `http://foundry.myhost.com` should now be showing the foundry instance served by the process manager pm2. Looks great already! 
+ 
+### Set up SSL (HTTPS) Encryption
+The Let's encrypt!-Homepage has information about installing the Certbot on different systems, the one for [Ubuntu Linux and nginx](https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx) should be the right one. Let's just follow the instructions on their website (from 07/08/2019):
+
+```
+sudo apt-get install software-properties-common
+sudo add-apt-repository universe
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt-get update
+sudo apt-get install certbot python-certbot-nginx
+```
+
+installs the software itself and `sudo certbot --nginx` runs the installer for nginx.
+
+Insert an e-mail address that will be contacted regarding critical information, agree to the terms of service after reading them thouroughly, choose if you want to share your e-mail address with the EFF and then choose your FQDN you want to secure (foundry.myhost.com) and enable automatic redirection of someone insists of using non-encrypted connections.
+
+Everything else, including the automatic renewal after three months is now setup and you are done with a sparkling new installation of Foundry using a subdomain of your choice and an encrypted connection of you and your players to the gaming instance. Have fun!
+
+```
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator nginx, Installer nginx
+Enter email address (used for urgent renewal and security notices) (Enter 'c' to
+cancel): info@myhost.com
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf. You must
+agree in order to register with the ACME server at
+https://acme-v02.api.letsencrypt.org/directory
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(A)gree/(C)ancel: A
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Would you be willing to share your email address with the Electronic Frontier
+Foundation, a founding partner of the Let's Encrypt project and the non-profit
+organization that develops Certbot? We'd like to send you email about our work
+encrypting the web, EFF news, campaigns, and ways to support digital freedom.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: n
+
+Which names would you like to activate HTTPS for?
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: foundry.myhost.com
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate numbers separated by commas and/or spaces, or leave input
+blank to select all options shown (Enter 'c' to cancel): 1
+Obtaining a new certificate
+Performing the following challenges:
+http-01 challenge for foundry.myhost.com
+Waiting for verification...
+Cleaning up challenges
+Deploying Certificate to VirtualHost /etc/nginx/sites-enabled/foundry
+
+Please choose whether or not to redirect HTTP traffic to HTTPS, removing HTTP access.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: No redirect - Make no further changes to the webserver configuration.
+2: Redirect - Make all requests redirect to secure HTTPS access. Choose this for
+new sites, or if you're confident your site works on HTTPS. You can undo this
+change by editing your web server's configuration.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 2
+Redirecting all traffic on port 80 to ssl in /etc/nginx/sites-enabled/foundry
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Congratulations! You have successfully enabled
+https://foundry.myhost.com
+
+You should test your configuration at:
+https://www.ssllabs.com/ssltest/analyze.html?d=foundry.myhost.com
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/foundry.myhost.com/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/foundry.myhost.com/privkey.pem
+   Your cert will expire on 2019-10-06. To obtain a new or tweaked
+   version of this certificate in the future, simply run certbot again
+   with the "certonly" option. To non-interactively renew *all* of
+   your certificates, run "certbot renew"
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+```
+
+#### Adding Auto-Refreshing of the SSL Certificate
+
+First, create a new directory that is used by Certbot to auto-refresh your new certificate: `sudo mkdir /var/www/letsencrypt` and reference to this location for a very specific http answer that letsencrypt wants to verify. Open up your Nginx configuration for foundry and add some more configuration items: `sudo nano /etc/nginx/sites-available/foundry`.
+
+Right above the section `location / { .... }` you prepend the following block:
+
+```
+include conf.d/drop;
+
+location ^~ /.well-known/acme-challenge {
+    allow all;
+    root /var/www/letsencrypt;
+    auth_basic off;
+}
+```
+At the end, the whole configuration file should look like this:
+
+```
+server {
+    # Adjust this to your the FQDN you chose!
+    server_name                 foundry.myhost.com;
+
+    access_log                  /var/log/nginx/foundry/access.log;
+    error_log                   /var/log/nginx/foundry/error.log;
+
+    include conf.d/drop;
+
+    location ^~ /.well-known/acme-challenge {
+        allow all;
+        root /var/www/letsencrypt;
+        auth_basic off;
+    }
+
+    location / {
+        proxy_set_header        Host $host;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
+
+        # Adjust the port number you chose!
+        proxy_pass              http://127.0.0.1:8080;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_read_timeout      90;
+
+        # Again, adjust both your FQDN and your port number here!
+        proxy_redirect          https://127.0.0.1:8080 http://foundry.myhost.com;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/foundry.myhost.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/foundry.myhost.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = foundry.myhost.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+    server_name                 foundry.myhost.com;
+    return 404; # managed by Certbot
+}
+```
+
+Now create a new file `sudo nano /etc/nginx/conf.d/drop`, add the following contents into it and restart nginx with `sudo service nginx restart`:
+
+```
+# Most sites won't have configured favicon or robots.txt
+# and since its always grabbed, turn it off in access log
+# and turn off it's not-found error in the error log
+location = /favicon.ico { access_log off; log_not_found off; }
+location = /robots.txt { access_log off; log_not_found off; }
+location = /apple-touch-icon.png { access_log off; log_not_found off; }
+location = /apple-touch-icon-precomposed.png { access_log off; log_not_found off; }
+
+# Rather than just denying .ht* in the config, why not deny
+# access to all .invisible files
+location ~ /\. { deny  all; access_log off; log_not_found off; } 
+```
+
+## Final Steps
+Open up your web browser at http://foundry.myhost.com and it should automatically redirect to the encrypted site at https://foundry.myhost.com. Everything else should work as you are used to.
+
+## Something Went Wrong
+Make sure that your port 443 is accessible. UFW (Universal FireWall) is pretty common, so you can check `ufw status` and see if that is enabled. `sudo ufw allow https` and `sudo ufw allow http` should add ports 80 and 443 to your firewall, thus allowing access to your ssl encrypted foundry instance and the Certbot for it's automatic certification renewal
+
+Check the `pm2 log foundry` for errors on the configuration there. Perhaps foundry starts up, fails and pm2 wants to restart it all the time, resulting in an endless loop of frustration for everybody? Stop the process by `pm2 stop foundry` and run it manually `node /home/ubuntu/foundry/resources/app/main.js` and check for errors (directory permissions are alright? Perhaps you changed anything there and it's just not working?).
+ 
 ## MORE INFO
 
 After you’ve set up Foundry, you’ll want to add in the information that Foundry needs to connect to S3. First, you need to create a .json file to contain the access key ID and secret access key, as well as your preferred region. You can place this anywhere you like, but for simplicity’s sake, I like to put it alongside my options.json file, like so.
