@@ -213,8 +213,10 @@ cd ~/foundry
 ### Purchase FoundryVTT
 Now is the time to buy foundry if you haven't already. You are going to need a license key in the next step. There are two ways you can buy FoundryVTT. The first is through the Patreon and the second is through the website. Each requires different steps to get it downloaded and installed on your EC2 instance.
 
+@TODO: The following two sections need to be cleaned up. What I ended up doing was downloaded the Linux version from FoundryVTT and uploaded it to our S3 bucket. Then used wget like recommended in the Patreon instance to wget the file on our S3 instance.
+
 ### Download FoundryVTT and Unpack It
-#### If purchased on FoundryVTT's Patreon
+#### If purchased through FoundryVTT's Patreon
 Go to your patreon page and grab the link for the Linux version of foundry, it should look like this:
 
 `https://foundryvtt.s3-us-west-2.amazonaws.com/releases/[AccessKey]/FoundryVirtualTabletop-linux-x64.zip`
@@ -223,10 +225,40 @@ Enter the following into the terminal to download Foundry from Patreon:
 
 `wget https://foundryvtt.s3-us-west-2.amazonaws.com/releases/[AccessKey]/FoundryVirtualTabletop-linux-x64.zip`
 
-#### If purchased on FoundryVTT.com
-Download the node.js zip file from Foundry's website by going logging into [https://foundryvtt.com](FoundryVTT.com) your profile and clicking on Purchased Licenses. From here, you'll need to use a file transfer protocal (FTP) utility that supports SCP or SFTP to upload the file to your EC2 virtual machine instance. Examples of this are FileZilla, Cyberduck, or Transmit.
+#### If purchased through FoundryVTT.com
+Download the node.js zip file from Foundry's website by going logging into [https://foundryvtt.com](FoundryVTT.com) your profile and clicking on Purchased Licenses. Download the version next to "Linux".
 
-You'll need to use the same credentials you used to log in via SSH. Provide your client of choice with the server address, username, and password or SSH private key, and you should be able to log in and navigate to the Foundry directory you just set up. Drag and drop the .zip file to there.
+From here, you'll need to use a secure file transfer protocal (SFTP) utility to upload the file to your EC2 virtual machine instance. Examples of this are FileZilla, Cyberduck, or Transmit.
+
+You'll use the same credentials you used to log in via (Terminal) SSH. Provide your SFTP client of choice with the server address, username, and password or SSH private key, and you should be able to log in and navigate to the Foundry directory you just set up. Drag and drop the .zip file to there.
+
+### Install the Unzip module
+Copy and paste the following and hit enter.
+`sudo apt install unzip`
+
+### Unzip the FoundryVTT file you just uploaded and then delete the ZIP
+Replace the file names below with your file names (e.g. "foundryvtt-0.7.0")  and then copy and paste the following and hit enter. 
+
+```
+unzip foundryvtt-0.6.6.zip
+rm foundryvtt-0.6.6.zip
+```
+
+### Start up FoundryVTT
+Check if Foundry starts up without any errors by running it from the command line
+
+`node /home/ubuntu/foundry/resources/app/main.js --port=8080`
+
+If you get the error `Error: The fallback data path /home/ubuntu/.local/share/FoundryVTT does not exist.` then do the following. Type "cd" and hit enter. This will put you in the parent directory. Now type `mkdir -p .local/share/FoundryVTT` and hit enter. Now type `foundry` and hit enter and then `node /home/ubuntu/foundry/resources/app/main.js --port=8080`.
+
+### Your instance is running!?
+If you see something similar to the following, your FoundryVTT instance is running!
+
+```
+FoundryVTT | 2020-08-31 02:46:52 | [warn] Software license requires signature.
+FoundryVTT | 2020-08-31 02:46:52 | [info] Requesting UPnP port forwarding to destination 8080
+FoundryVTT | 2020-08-31 02:46:52 | [info] Server started and listening on port 8080
+```
 
 ## MORE INFO
 
