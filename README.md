@@ -169,17 +169,66 @@ Click the Attach existing policies directly button. This will bring up a long li
 ## Install FoundryVTT on your AWS Elastic Cloud Compute (EC2) Instance
 You’re now ready to set up your new AWS-hosted Ubuntu server with Foundry. Again, you can find the generic guide [here](https://github.com/foundry-vtt-community/wiki/wiki/Ubuntu-VM).
 
-You’ll need the key pair you created in order to log in via ssh. Before you log in, though, you’ll need to change the permissions on the keyfile so other users on your computer can’t read it. On Linux/MacOS, you can do so with the following command:
 
-`chmod 600 /path/to/keypair.pem`
+### Update permisions on your ".pem" file
+Go to your ".pem" file and right click on it and select "Get Info". In the pop-up, in the bottom right corner, click the padlock. Then under the "Sharing & Permissions" header select any row that is not your user account (e.g. has "me" in it) or "everyone" and delete them by clicking the "minus". Then ensure "everyone" has a privlege of "No Access". Setting these permission on this file will meet the prerequesited required for the next step.
 
-A typical SSH command to log into an EC2 instance at the command line looks like this, with the appropriate information replaced:
+### Log into your EC2 instance with your ".pem" file
+Go back to the EC2 Dashboard and in the sidebar click "Instances". Check the checkbox next to the instance you previously created and click "Connect". This will give you a pop-up with a "Connection method" already selected "A standalone SSH client". On Mac's, Terminal is your SSH client. Simplely hit CMD+Spacebar to bring up Mac's Spotlight search and type in "Terminal". Run the "Terminal" application.
 
-`ssh -i /path/to/keypair.pem ubuntu@<your-instance-public-ip>`
-  
-This should work in both a Linux or MacOS terminal.
+With terminal running, navigate to the directly with ".pem" key file you created earlier. If you've never used Terminal before, you can type "ls" without the quotes and hit enter. This will show all the folders and files in the directory you're currently located. To dive deeper into a directory type "cd {directory name}" for example I might type "cd desktop" to navigate from my user folder into its desktop folder. If you need to go up a directory you can type "cd.." and then would move me from my "desktop" folder back up to its parent "user" folder.
 
-For Windows users, I advise using the free terminal emulator PuTTY. AWS themselves have a complete guide [on how to connect to a running EC2 instance using PuTTY](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html) which is quite easy to follow.
+I have put my ".pem" file in a foulder in my desktop titled "Foundry" to navigate from a fresh terminal instance I type "cd desktop" and hit enter. Then "cd foundry" and hit enter. While in the "Foundry" folder if I type "ls" and hit enter it will list all the files in the folder. If I see my ".pem" file I am in the right place. Now I can copy/paste from the "Example" shown on the S3 popup. Copy and past it into your terminal and hit enter.
+
+e.g. `ssh -i "foundry-key-pair.pem" ubuntu@ec2-3-93-212-97.compute-1.amazonaws.com`
+
+This will log you into your EC2 instance using your ".pem" file which acts like a password.
+
+### Install Node and NPM on your EC2 instance
+You are now logged into your Ubuntu server running on AWS EC2. You will now want to install Node and NPM (Node Package Manager) which are required for foundry to run. To do just that, copy and paste the following into your terminal and hit enter. When you do this, you may get a warning that Node is out of date. Don't worry, we'll update it next. Also this process of downloading and installing may take a few miuntes. Wait until the text stops scrolling and you see your cursor after the "$" sign.
+
+```
+curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+### Install a Reverse Proxy and the Unzip Utility on your EC2 instance
+Copy and paste the following and hit enter. Confirm "Do you want to continue?" by pressing "y"
+
+`sudo apt-get install nginx unzip`
+
+### Install the Process Manager pm2 on your EC2 instance
+Copy and paste the following and hit enter. 
+
+`sudo npm install pm2 -g`
+
+### Create a directory for Foundry to be installed in
+Copy and paste the following and hit enter. 
+
+```
+# switch to the home directory
+mkdir ~/foundry
+cd ~/foundry
+```
+
+### Purchase FoundryVTT
+Now is the time to buy foundry if you haven't already. You are going to need a license key in the next step. There are two ways you can buy FoundryVTT. The first is through the Patreon and the second is through the website. Each requires different steps to get it downloaded and installed on your EC2 instance.
+
+### Download FoundryVTT and Unpack It
+#### If purchased on FoundryVTT's Patreon
+Go to your patreon page and grab the link for the Linux version of foundry, it should look like this:
+
+`https://foundryvtt.s3-us-west-2.amazonaws.com/releases/[AccessKey]/FoundryVirtualTabletop-linux-x64.zip`
+
+Enter the following into the terminal to download Foundry from Patreon:
+
+`wget https://foundryvtt.s3-us-west-2.amazonaws.com/releases/[AccessKey]/FoundryVirtualTabletop-linux-x64.zip`
+
+#### If purchased on FoundryVTT.com
+Download the node.js zip file from Foundry's website by going logging into [https://foundryvtt.com](FoundryVTT.com) your profile and clicking on Purchased Licenses. From here, you'll need to use a file transfer protocal (FTP) utility that supports SCP or SFTP to upload the file to your EC2 virtual machine instance. Examples of this are FileZilla, Cyberduck, or Transmit.
+
+You'll need to use the same credentials you used to log in via SSH. Provide your client of choice with the server address, username, and password or SSH private key, and you should be able to log in and navigate to the Foundry directory you just set up. Drag and drop the .zip file to there.
+
+## MORE INFO
 
 After you’ve set up Foundry, you’ll want to add in the information that Foundry needs to connect to S3. First, you need to create a .json file to contain the access key ID and secret access key, as well as your preferred region. You can place this anywhere you like, but for simplicity’s sake, I like to put it alongside my options.json file, like so.
 
