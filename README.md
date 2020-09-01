@@ -575,6 +575,14 @@ Save the file, then go into the Configuration tab of the Foundry setup page. Put
 
 Once you’ve done that, you should be able to launch a game table and open the image browser. You should see a tab for Amazon S3 that will let you choose objects uploaded to S3 as well as upload objects to S3. Note that if you like organization, you cannot create folders or delete in S3 from this tab at this time – you’ll need to use the S3 console to create folders for organization, or remove media you no longer need.
 
+## OPTIONAL: Set up NGINX to Sign In prompt for the domain
+Should you want to restrict access to the domain and its subdomains via a browser Sign In prompt simply to stop bots from ever crawling you FoundryVTT instance copy and paste the following and hit enter.
+
+@TODO
+
+## OPTIONAL: Set up Landing Page for the main domain
+
+@TODO
 
 ## TODO's
 Add info about Elastic EC2 IP Addresses
