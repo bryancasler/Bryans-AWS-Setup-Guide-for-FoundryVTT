@@ -182,7 +182,12 @@ I have put my ".pem" file in a foulder in my desktop titled "Foundry" to navigat
 
 e.g. `ssh -i "foundry-key-pair.pem" ubuntu@ec2-3-93-212-97.compute-1.amazonaws.com`
 
-This will log you into your EC2 instance using your ".pem" file which acts like a password.
+This will log you into your EC2 instance using your ".pem" file which acts like a password. The first time you log in it may display something similar to the following. If so, type "yes" and hit enter.
+
+```
+ECDSA key fingerprint is SHA256:Vw6TSx3EmsjzOWJaKoYsC9vIxxPDDQG1j7INx1zIIds.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? 
+```
 
 ### Install Node and NPM on your EC2 instance
 You are now logged into your Ubuntu server running on AWS EC2. You will now want to install Node and NPM (Node Package Manager) which are required for foundry to run. To do just that, copy and paste the following into your terminal and hit enter. When you do this, you may get a warning that Node is out of date. Don't worry, we'll update it next. Also this process of downloading and installing may take a few miuntes. Wait until the text stops scrolling and you see your cursor after the "$" sign.
@@ -313,9 +318,13 @@ The configuration files for nginx are stored at /etc/nginx and split up in `/etc
 
 We need to allow larger upload sizes (scene backgrounds are sometimes rather large). 10 MB should be quite okay, but feel free to adjust this value.
 
-Edit the nginx configuration and append the following line into the section `http { ... }` right before the closing bracket, this is rather important:
+Copy and paste the following and hit enter
 
 `sudo nano /etc/nginx/nginx.conf`
+
+The result will be the content of nginx.conf which you can edit and append the following line into the section `http { ... }` right before the closing bracket, this is rather important (recording: https://d.pr/v/M30ufg).
+
+Copy the code between the brackets below and scroll down the corresponding section in Terminal. Then paste it in and hit "Control + X" to exit. When existing it will ask if you want to save your changes so hit "y". Then it will ask for a directory and name, prepopulated with its current directly and name, simply hit "enter" to confirm this and it will save over the existing file.
 
 ```
 http {
@@ -323,9 +332,16 @@ http {
         client_max_body_size 10m;
 }
 ```
-Afterwards, we can create a new configuration for our reverse proxy for Foundry: `sudo nano /etc/nginx/sites-available/foundry`.
 
-Copy the following contents and paste it into the nano editor, then adjust every occurance of the port number :8080 and your FQDN to your configuration, then save the file.
+Afterwards, we can create a new configuration for our reverse proxy for Foundry.
+
+Copy and paste the following and hit enter.
+`sudo nano /etc/nginx/sites-available/foundry`.
+
+You've created a opened a text editor at the path specified. Copy the following contents and paste it into the nano editor, then adjust every occurance of the port number :8080 and your fully qualified domain name (FQDN) to your configuration.
+
+Once you're ready to save hit "Control + X" to exit. When existing it will ask if you want to save your changes so hit "y". Then it will ask for a directory and name, prepopulated with its current directly and name, simply hit "enter" to confirm this and it will save over the existing file.
+
 
 ```
 server {
