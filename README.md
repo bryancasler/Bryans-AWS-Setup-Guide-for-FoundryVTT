@@ -546,15 +546,15 @@ location = /apple-touch-icon-precomposed.png { access_log off; log_not_found off
 location ~ /\. { deny  all; access_log off; log_not_found off; } 
 ```
 
-## Final Steps
-Open up your web browser at http://foundry.myhost.com and it should automatically redirect to the encrypted site at https://foundry.myhost.com. Everything else should work as you are used to.
-
 ## Something Went Wrong
 Make sure that your port 443 is accessible. UFW (Universal FireWall) is pretty common, so you can check `ufw status` and see if that is enabled. `sudo ufw allow https` and `sudo ufw allow http` should add ports 80 and 443 to your firewall, thus allowing access to your ssl encrypted foundry instance and the Certbot for it's automatic certification renewal
 
 Check the `pm2 log foundry` for errors on the configuration there. Perhaps foundry starts up, fails and pm2 wants to restart it all the time, resulting in an endless loop of frustration for everybody? Stop the process by `pm2 stop foundry` and run it manually `node /home/ubuntu/foundry/resources/app/main.js` and check for errors (directory permissions are alright? Perhaps you changed anything there and it's just not working?).
+
+## Final Steps
+Open up your web browser at http://foundry.myhost.com and it should automatically redirect to the encrypted site at https://foundry.myhost.com. Everything else should work as you are used to.
  
-## MORE INFO
+## Connect FoundryVTT with S3
 
 After you’ve set up Foundry, you’ll want to add in the information that Foundry needs to connect to S3. First, you need to create a .json file to contain the access key ID and secret access key, as well as your preferred region. You can place this anywhere you like, but for simplicity’s sake, I like to put it alongside my options.json file, like so.
 
