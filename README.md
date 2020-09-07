@@ -594,3 +594,8 @@ Add info about connecting FoudnryVTT storage with S3
 ## Contributions
 - [Foundry VTT Community - Self Hosting on AWS](https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/)
 - [Foundry VTT Community - Unbuntu VW](https://github.com/foundry-vtt-community/wiki/wiki/Ubuntu-VM) - @ShadowMorph from Discord provided additions to the nginx/SSl configuration which Saif Addin partly added to the above config. Without ShadowMorph's support, the auto-refreshing would not have worked and the SSL configuration would be quite a bit less robust.
+
+## Bryan's Repositories
+- [Bryan's AWS Setup Guide for FoundryVTT](https://github.com/bryancasler/Bryans-AWS-Setup-Guide-for-FoundryVTT)
+- [Bryan's FoundryVTT Assets and Resources](https://github.com/bryancasler/Bryans-FoundryVTT-Assets-And-Resources)
+- [Bryan's Preferred Modules for FoundryVTT](https://github.com/bryancasler/Bryans-Preferred-Modules-for-FoundryVTT)
