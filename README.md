@@ -590,6 +590,7 @@ Add better info about domain and sub-domain setup for Hover.com
 Add info about Vouch-Proxy SSO login (https://github.com/vouch/vouch-proxy) and (https://www.reddit.com/r/FoundryVTT/comments/hw14rr/anyone_else_using_container/)
 Add info about Resource Monitoring for EC2 / S3
 Add info about connecting FoudnryVTT storage with S3
+  - Finally got it working, but not sure how. Was probably due in part to this tutorial (https://www.youtube.com/watch?v=AQtTG2N_QCg) which recommended this for port changes (https://d.pr/i/vp0opr) and I also learned about "Account Users ID"
 
 ## Contributions
 - [Foundry VTT Community - Self Hosting on AWS](https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/)
