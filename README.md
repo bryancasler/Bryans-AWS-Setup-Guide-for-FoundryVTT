@@ -5,7 +5,7 @@
 ![Bryan's AWS Set Up Guide for FoundryVTT](https://raw.githubusercontent.com/bryancasler/Bryans-AWS-Setup-Guide-for-FoundryVTT/master/assets/Bryan's%20AWS%20Setup%20Guide%20for%20Foundry%20VTT%20-%20Title%20-%20On%20White.png)
 
 ## November, 2020 (GO HERE)
-This guide was never fully completed and there are also better guides out there now, yet this guide still gets regular traffic. I recommend looking at this guide by /u/auraofire and /u/lulu1993cooly [We are back with a big update to the beginner friendly AWS Foundry server deployment. Even the most basic of computer users can now deploy a Foundry server complete with SSL, web server, and reverse proxy automatically configured in a matter of minutes.](https://www.reddit.com/r/FoundryVTT/comments/j3bpdb/we_are_back_with_a_big_update_to_the_beginner/)
+This guide was never fully completed and there are also better guides out there now, yet this guide still gets regular traffic. I recommend looking at this guide by /u/auraofire and /u/lulu1993cooly. It is MUCH faster and foolproof. [We are back with a big update to the beginner friendly AWS Foundry server deployment. Even the most basic of computer users can now deploy a Foundry server complete with SSL, web server, and reverse proxy automatically configured in a matter of minutes.](https://www.reddit.com/r/FoundryVTT/comments/j3bpdb/we_are_back_with_a_big_update_to_the_beginner/)
 
 --
 
