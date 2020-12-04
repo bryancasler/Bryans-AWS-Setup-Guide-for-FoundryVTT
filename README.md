@@ -1,4 +1,4 @@
-## November, 2020
+## December, 2020
 This guide was never fully completed and there are now better guides out there now, yet this guide still gets regular traffic. 
 
 If you're interested in a more hands on approach, then take a look at these guides. These are were what started it all and put me down this path. [Foundry VTT Community - Self Hosting on AWS](https://foundry-vtt-community.github.io/wiki/Self-Hosting-on-AWS/)
